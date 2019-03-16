@@ -1,0 +1,6 @@
+Male is 0
+Female is 1
+
+Distance will be calculated with euclidian Distance
+    - The final selection will be done with the formula of:
+        - (suicides per 100k / distance) 
