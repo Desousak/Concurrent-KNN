@@ -51,14 +51,18 @@ std::map<std::string, std::vector<std::string> > load_data(
     // Fill the columns
     while (!data_stream.eof()) {
         std::getline(data_stream, row);
-        // Delimit the row
-        std::vector<std::string> row_data = delimit_string(row, ',');
         
-        int index = 0;
-        // Insert the data into the map
-        for(std::string column : columns){
-            table_data.at(column).push_back(row_data[index]);
-            index++;
+        // Prevent if the line is empty
+        if(row != ""){
+            // Delimit the row
+            std::vector<std::string> row_data = delimit_string(row, ',');
+            
+            int index = 0;
+            // Insert the data into the map
+            for(std::string column : columns){
+                table_data.at(column).push_back(row_data[index]);
+                index++;
+            }
         }
     }
 
