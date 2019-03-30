@@ -2,26 +2,102 @@
 #include <sstream>
 #include <iostream>
 #include <map>
+#include <cmath>
 #include <string>
 #include <vector>
 
 #define k 5
 #define data_file "Modified-Dataset.csv"
 
+struct smallest_data {
+    std::string data;
+    double distance;
+};
+
+std::string used_columns[] = {"country", "year", "age", "sex", "suicides/100k"};    
+
 std::map<std::string, std::vector<std::string> > load_data(
     std::string filename);
 
 std::vector<std::string> delimit_string(std::string line, char delimiter);
 
+std::vector<struct smallest_data> determine_smallest(std::vector<struct smallest_data> smallest_distances, std::string value,  double distance);
+
 int main() {
     // Load the data
     std::map<std::string, std::vector<std::string> > table_data = load_data(data_file); 
     
+    // Smallest distances
+    std::vector<struct smallest_data> smallest_distances;
+
     // Ask for input
-    
+    std::vector<std::string> user_input;
+    user_input.push_back("2019");
+    user_input.push_back("20");
+    user_input.push_back("0");
+
+    int amount_of_rows = table_data.at(used_columns[0]).size();
+    int amount_of_cols = sizeof(used_columns) / sizeof(used_columns[0]);
+
+    // Calculate distances from user input's data to the current data set
+    for (int i = 0; i < amount_of_rows; i++){
+        double distance;
+        for (int j = 1; j < amount_of_cols - 1; j++){
+            double tmp =  stod(table_data.at(used_columns[j])[i]) - stod(user_input[j - 1]);
+            distance += tmp * tmp;
+        }
+        // Calculate the euclidean distance 
+        distance = sqrt(distance);
+        // Factor in the suicides/100k rate into the suicide possibility
+        distance = stod(table_data.at(used_columns[amount_of_cols-1])[i]) / distance;
+        smallest_distances = determine_smallest(smallest_distances, table_data.at(used_columns[0])[i], distance);  
+    }
+
+    // print info
+    for(int i = 0; i < smallest_distances.size(); i++){
+        std::cout << smallest_distances[i].data << " " << smallest_distances[i].distance << std::endl;
+    }
+}
 
 
+std::vector<struct smallest_data> determine_smallest(std::vector<struct smallest_data> smallest_distances, std::string value,  double distance){
+    int largest_index = -1;
+    int replace = false;
 
+    // Check if the vector still has empty indices
+    if(smallest_distances.size() >= k){
+        for(int i = 0; i < smallest_distances.size(); i ++){
+            // Find the index with the largest distance value
+            if(largest_index == -1 || smallest_distances[i].distance <= smallest_distances[largest_index].distance){
+                largest_index = i;
+            }
+            // If the new distance is greater than the current distances, then 
+            if(distance > smallest_distances[i].distance){
+                replace = true;
+            }
+        }
+    // If the vector is empty
+    } else {
+        replace = true;
+    }
+
+    // Remove the value at the largest index
+    if(replace){
+        // Check if an index needs to be removed
+        if(largest_index != -1){
+            smallest_distances.erase(smallest_distances.begin() + largest_index);
+        }
+        // assign new values to a new struct
+        struct smallest_data tmp;
+        tmp.data = value;
+        tmp.distance = distance;
+
+        // push the new struct into the vector
+        smallest_distances.push_back(tmp);
+    }
+
+    return smallest_distances;
+   
 }
 
 std::map<std::string, std::vector<std::string> > load_data(
