@@ -53,7 +53,7 @@ std::map<std::string, std::vector<std::string> > load_data(
         std::getline(data_stream, row);
         // Delimit the row
         std::vector<std::string> row_data = delimit_string(row, ',');
-
+        
         int index = 0;
         // Insert the data into the map
         for(std::string column : columns){
