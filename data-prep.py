@@ -20,7 +20,19 @@ with open("master.csv", encoding='utf-8-sig') as csv_file:
             header_row = False
         else:
             for col, header in zip(row, headers):
-                data[header].append(col)
+                if(header == 'age'):
+                    age_val = 0.0
+
+                    if(len(col) > 4):
+                        age_val = (int(col[0:2]) + int(col[3:len(col)])) / 2
+                    elif(len(col) == 4):
+                        age_val = (int(col[0:1]) + int(col[2: len(col) ])) / 2
+                    else:
+                        age_val = (100 + int(col[0:len(col) - 1])) / 2
+
+                    data[header].append(age_val)
+                else:
+                    data[header].append(col)
 
 
     # Dictonary that will be written out to the final file
