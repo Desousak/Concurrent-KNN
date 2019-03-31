@@ -32,8 +32,8 @@ int main() {
 
     // Ask for input
     std::vector<std::string> user_input;
-    user_input.push_back("2019");
-    user_input.push_back("20");
+    user_input.push_back("2000");
+    user_input.push_back("10");
     user_input.push_back("0");
 
     int amount_of_rows = table_data.at(used_columns[0]).size();
@@ -163,6 +163,7 @@ std::vector<std::string> delimit_string(std::string line, char delimiter){
     while(line_stream >> tmp){
         delimited_val += tmp;
 
+       
         // If there is a comma next
         if(line_stream.peek() == delimiter || line_stream.peek() == 13){
             // Ignore it
@@ -173,6 +174,9 @@ std::vector<std::string> delimit_string(std::string line, char delimiter){
 
             // Reset the column name variable
             delimited_val = "";
+        } else if((int)line_stream.peek() == 32){
+            // Add the space manually since it is not done
+            delimited_val += " ";
         }
     }
 
