@@ -12,7 +12,7 @@
 
 // Global Variables
 std::string used_columns[] = {"country", "year", "age", "sex", "gdp_for_year", "suicides/100k"};    
-int column_amount = 6;
+const int column_amount = 6;
 
 struct neighbors {
     std::string value;
