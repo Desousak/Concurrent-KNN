@@ -6,36 +6,45 @@
 #include <string>
 #include <vector>
 
-#define k 5
-#define data_file "Modified-Dataset.csv"
+#define data_file "edited.csv"
+#define test_file "Test-Set.csv"
 
 struct smallest_data {
     std::string data;
     double distance;
 };
 
-std::string used_columns[] = {"country", "year", "age", "sex", "suicides/100k"};    
+std::string used_columns[] = {"country", "year", "age", "sex", "gdp_for_year",  "suicides/100k"};    
 
-std::map<std::string, std::vector<std::string> > load_data(
-    std::string filename);
+std::map<std::string, std::vector<std::string> > load_data(std::string filename);
 
 std::vector<std::string> delimit_string(std::string line, char delimiter);
 
-std::vector<struct smallest_data> determine_smallest(std::vector<struct smallest_data> smallest_distances, std::string value,  double distance);
+std::vector<struct smallest_data> determine_smallest(int k, std::vector<struct smallest_data> smallest_distances, std::string value,  double distance);
+
+std::string knn(int k, std::vector<std::string> user_input, std::map<std::string, std::vector<std::string> > table_data);
 
 int main() {
     // Load the data
     std::map<std::string, std::vector<std::string> > table_data = load_data(data_file); 
-    
-    // Smallest distances
-    std::vector<struct smallest_data> smallest_distances;
 
     // Ask for input
     std::vector<std::string> user_input;
-    user_input.push_back("2000");
-    user_input.push_back("10");
-    user_input.push_back("0");
+    user_input.push_back("2008");
+    user_input.push_back("9.5");
+    user_input.push_back("1");
+    user_input.push_back("\"1\"");
 
+
+    std::string result = knn(5, user_input, table_data); 
+    std::cout << result << std::endl;
+}
+
+
+std::string knn(int k, std::vector<std::string> user_input, std::map<std::string, std::vector<std::string> > table_data){
+    // Smallest distances
+    std::vector<struct smallest_data> smallest_distances;
+    
     int amount_of_rows = table_data.at(used_columns[0]).size();
     int amount_of_cols = sizeof(used_columns) / sizeof(used_columns[0]);
 
@@ -50,17 +59,34 @@ int main() {
         distance = sqrt(distance);
         // Factor in the suicides/100k rate into the suicide possibility
         distance = stod(table_data.at(used_columns[amount_of_cols-1])[i]) / distance;
-        smallest_distances = determine_smallest(smallest_distances, table_data.at(used_columns[0])[i], distance);  
+        smallest_distances = determine_smallest(k, smallest_distances, table_data.at(used_columns[0])[i], distance);  
     }
 
-    // print info
+    // Select the most likely result
+    int highest_index = -1;
+    float highest_val = 0;
+
+    // TODO: MAKE THIS A PROPER SEARCH, THIS IS UGLY, SLOW AND BAD 
     for(int i = 0; i < smallest_distances.size(); i++){
-        std::cout << smallest_distances[i].data << " " << smallest_distances[i].distance << std::endl;
+        if(highest_index == -1 || smallest_distances[i].data != smallest_distances[highest_index].data){
+            float temp_val = 0;
+            for(int j = 0; j < smallest_distances.size(); j++){
+                if(smallest_distances[j].data == smallest_distances[i].data){
+                    temp_val += smallest_distances[j].distance;
+                }
+            }
+            if(temp_val > highest_val){
+                highest_index = i;
+                highest_val = temp_val;
+            }    
+        }
     }
+
+    return smallest_distances[highest_index].data;
 }
 
 
-std::vector<struct smallest_data> determine_smallest(std::vector<struct smallest_data> smallest_distances, std::string value,  double distance){
+std::vector<struct smallest_data> determine_smallest(int k, std::vector<struct smallest_data> smallest_distances, std::string value,  double distance){
     int largest_index = -1;
     int replace = false;
 
@@ -163,9 +189,8 @@ std::vector<std::string> delimit_string(std::string line, char delimiter){
     while(line_stream >> tmp){
         delimited_val += tmp;
 
-       
         // If there is a comma next
-        if(line_stream.peek() == delimiter || line_stream.peek() == 13){
+        if(line_stream.peek() == delimiter || line_stream.peek() == 13 || line_stream.peek() == -1){
             // Ignore it
             line_stream.ignore();
 

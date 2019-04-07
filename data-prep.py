@@ -31,6 +31,9 @@ with open("master.csv", encoding='utf-8-sig') as csv_file:
                         age_val = (100 + int(col[0:len(col) - 1])) / 2
 
                     data[header].append(age_val)
+                elif(header == 'gdp_for_year'):
+                    gdp_val = col.replace(',', '').replace('"', '') 
+                    data[header].append(gdp_val)
                 else:
                     data[header].append(col)
 
@@ -38,7 +41,7 @@ with open("master.csv", encoding='utf-8-sig') as csv_file:
     # Dictonary that will be written out to the final file
     final = {}
     # The data points we want
-    final_headers = ['country', 'year', 'age', 'sex', 'suicides/100k']
+    final_headers = ['country', 'year', 'age', 'sex', 'gdp_for_year', 'suicides/100k']
     for final_header in final_headers:
         final[final_header] = data[final_header]
 
