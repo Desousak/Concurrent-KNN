@@ -15,7 +15,7 @@
 #define test_file "test.csv"
 
 // The # of threads used
-#define MAX_THREADS 16
+#define MAX_THREADS 8
 
 // The columns to take into account and its size  
 const int column_amount = 6;
@@ -89,7 +89,7 @@ std::string knn(std::string user_input[column_amount]){
         // Set the thread id
         data[thread_id].thread_id = thread_id;
         // Copy the user's data
-        for(int i = 0; i < column_amount; i++){
+        for(int i = 0; i < column_amount - 2; i++){
             data[thread_id].user_input[i] = user_input[i];
         }
 
